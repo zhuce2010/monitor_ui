@@ -28,3 +28,19 @@ export const updatePass = (data) => {
     data
   })
 }
+// 使用手机号登陆
+export const loginPhone = (data) => {
+  return axios({
+    url: 'loginPhone',
+    method: 'post',
+    data
+  })
+}
+// 使用手机号登陆
+export const getCode = (data) => {
+  return axios({
+    url: 'getCode',
+    method: 'post',
+    data
+  })
+}
