@@ -141,10 +141,6 @@
                         {
                             duty=duty+table[val]+","
                         }
-
-                   //     if (val in )
-                      /*  if (val != "name"&& val !="realName"&& val!="__ob__"&&val != "id"&&val !="updateTime"&&val != "month"&&val !="length")
-                            duty=duty+table[val]+","*/
                     });
                     duty =duty.substr(0,duty.length-1)
                     console.log("duty")
@@ -291,23 +287,8 @@
 
                         })
                     }
-
-
-
-
-
-
-
-
-
                 })
-
-
-
             },
-
-
-
             getHeight: function () {
                 this.height = window.innerHeight - 280;
             },
