@@ -33,12 +33,17 @@
                       placeholder="选择时间">
       </el-time-select>
       <el-button class="saveButton" type="primary"size="medium" style="margin-left: 10px" @click="saveThisTime" >保 存</el-button>
+      <el-button class="backToHome" type="primary"size="medium" style="margin-left: 10px" @click="backToHome" >返回首页</el-button>
+
     </div>
     </template>
 
     <div style="margin-top: 20px">
 
-      <el-table id="table" class="tt"
+      <el-table
+        id="table"
+        v-loading.fullscreen.lock="loading"
+        class="tt"
         :data="tables"
         ref="multipleTable"
         tooltip-effect="dark"
@@ -46,26 +51,39 @@
         :element-loading-text="$t('action.loading')"
         render-header="changeLabel"
        >
-        <el-table-column label="序号" width="62px" type="index" fixed>
+        <el-table-column label="序号" width="52px" type="index" fixed>
         </el-table-column>
-        <el-table-column label="姓名" width="82px" align="center" prop="realName" fixed>
+        <el-table-column label="姓名" width="82px" align="center" prop="realName" fixed style="margin-left: 4px" >
         </el-table-column>
-        <template v-for='(col) in columnList'>
+        <template v-for='(col) in showColumnList'>
           <el-table-column
             :prop = "String(col)"
-            :label= "String(col)+'号'"
+            :label= "String(col)+'日'"
             align="center"
-            width = "104px">
+            width = "85px"
+            column-rule-width="0px"
+          >
             <template slot-scope="scope">
-              <el-button size="medium" v-for="item in monitorTypeOptions" :key="item.key"  v-if="scope.row[col]=== item.key" @click="changeStatus(scope,col)"   :type="buttonType(item.key)" >
+              <el-button size="small" v-for="item in monitorTypeOptions" :key="item.key"  v-if="scope.row[col]=== item.key" @click="changeStatus(scope,col)"   :type="buttonType(item.key)" >
                 {{item.display_name}}
               </el-button>
             </template>
           </el-table-column>
+
         </template>
+
       </el-table>
+
     </div>
+    <div style="margin-top: 20px">
+      <el-button id="toFront"  type="primary"size="medium"  style="margin-left:150px"  @click="getFrontDay" >1-15日</el-button>
+      <el-button id="toBack" type="primary"size="medium"  @click="getBackDay" >16-31日</el-button>
+
+    </div>
+
+
   </div>
+
 </template>
 <script>
     export default {
@@ -94,6 +112,9 @@
                     {key:0, display_name: '休息'}
                 ],
                 columnList:[],
+                showColumnList:[],
+                nowdate:'',
+                dayCount:1,
                 delLoading: false,
                 pageRequest: {pageNum: 1, pageSize: 10},
                 pageResult: {},
@@ -109,6 +130,35 @@
             this.loading = false
         },
         methods: {
+            getFrontDay(){
+                if (this.dayCount ==2)
+                {
+                    this.showColumnList =new Array(15)
+                    for ( var i = 1; i < 16; i++) {
+                        this.showColumnList[i-1] = i
+                    }
+                }
+                this.dayCount =1
+
+            },
+            getBackDay(){
+                if (this.dayCount ==1)
+                {
+                    var day = this.mGetDate(this.nowdate);
+                    this.showColumnList =new Array(day-15)
+                    for ( var i = 16; i < day+1; i++) {
+                        this.showColumnList[i-16] = i
+                        console.log(this.showColumnList)
+                    }
+                    this.dayCount =2
+                }
+            },
+
+
+            backToHome(){
+                this.$router.push("/Home")
+
+            },
             buttonType(key){
                 if (key==1) return "danger"
 
@@ -172,8 +222,11 @@
             setMonthChange:function(){
                 console.log("选择月："+this.month)
                console.log(this.getYearAndMonth(this.month))
+                this.loading = true
+                this.dayCount =1
                 this.getDayList(this.month)
                 this.getTables(this.month)
+                this.loading = false
                 console.log("after:"+this.getYearAndMonth(this.month))
 
             },
@@ -204,11 +257,12 @@
                 return newyear + "-" + newmonth;
     },
              mGetDate:function(date){
-                if (date==null)
+                if (date==null||date =='')
                 {
                      date = new Date();
                 }
-              var year = date.getFullYear();
+                 this.nowdate =date
+                 var year = date.getFullYear();
               var month = date.getMonth()+1;
               var d = new Date(year, month, 0);
               console.log(d.getDate())
@@ -221,7 +275,25 @@
                 for ( var i = 1; i < day+1; i++) {
                     column[i-1] = i
                 }
+                var toFront = document.getElementById("toFront");
+                var toBack = document.getElementById("toBack");
+                var toBackButtonString = '16-'+ day +'日'
+                toBack.innerHTML = toBackButtonString;
                 this.columnList = column
+                if (this.dayCount == 1)
+                {
+                    this.showColumnList =new Array(15)
+                    for ( var i = 1; i < 16; i++) {
+                        this.showColumnList[i-1] = i
+                    }
+                }
+                if (this.dayCount == 2)
+                {
+                    this.showColumnList =new Array(day-15)
+                    for ( var i = 16; i < day+1; i++) {
+                        this.showColumnList[i-16] = i
+                    }
+                }
                 console.log(this.columnList)
             },
             getTables :function(data){
