@@ -4,8 +4,8 @@
    <el-container>
 
 <el-main >
-  <el-button class="libutton" type="primary" >KPI监控</el-button>
-  <el-button class="libutton" type="success">大屏监控</el-button>
+  <el-button class="libutton" type="primary" @click="toKPI()">KPI监控</el-button>
+  <el-button class="libutton" type="success" @click="toDaily()">大屏监控</el-button>
   <el-button class="libutton" type="danger" @click.native="toSchedual">排版计划</el-button>
 </el-main>
    </el-container>
@@ -18,6 +18,15 @@
         toSchedual()
         {
             this.$router.push('/Schedual/Index')
+        },
+        toKPI(){
+            window.location.href = "http://133.96.9.70:8080/daily-monitor/KPIMonitor/KPIView"
+
+            //this.$router.push('/daily-monitor/KPIMonitor/KPIView')
+        },
+        toDaily(){
+            window.location.href = "http://133.96.9.70:8080/daily-monitor/DailyMonitor/DailyView"
+            //this.$router.push('/daily-monitor/DailyMonitor/DailyView')
         },
     },
     }

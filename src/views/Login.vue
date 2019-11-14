@@ -77,8 +77,8 @@
                 loading: false,
                 loginImg: "@/assets/login.jpg",
                 loginForm: {
-                    account: 'admin',
-                    password: 'admin',
+                    account: '',
+                    password: '',
                     phone:'',
                     code:'',
                     captcha: '',
@@ -146,7 +146,7 @@
                         })
                     } else {
                         //              Cookies.set('token', res.data.token) // 放置token到Cookie
-                     //   sessionStorage.setItem('user', userInfo.account) // 保存用户到本地会话
+                        sessionStorage.setItem('user', userInfo.account) // 保存用户到本地会话
                         //              this.$store.commit('menuRouteLoaded', false) // 要求重新加载导航菜单
                         this.$router.push('/Home')  // 登录成功，跳转到主页
                     }

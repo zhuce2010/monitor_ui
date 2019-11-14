@@ -6,7 +6,8 @@ Vue.use(Router)
 import Login from '@/views/Login'
 import Home from '@/views/Home'
 import Schedual from '@/views/Schedual/Index'
-export default new Router({
+const router = new Router({
+  mode:'history',
   routes: [
     {
       path: '/Home',
@@ -23,29 +24,33 @@ export default new Router({
       name: '排版计划',
       component: Schedual
     },
-
-
-
-
   ],
 })
-/*
 // to 即将跳转的页面
 // from 要离开的额页面
 // next 函数
-this.$router.beforeEach((to, from, next) => {
+router.beforeEach((to, from, next) => {
   // 获取cookie中的信息，进行校验
-  let token = Cookies.get('token')
+  //let token = Cookies.get('token')
   let userName = sessionStorage.getItem('user')
-
+    console.log("11111")
+  console.log(userName)
+  if(to.path ==='/')
+  {
+    next()
+  }else {
     if (!userName) {
       // 如果访问非登录界面，且户会话信息不存在，代表未登录，则跳转到登录界面
+      //  next()
       next({path: '/'})
     } else {
       // 加载动态菜单和路由
-      addDynamicMenuAndRoutes(userName, to, from)
+      // addDynamicMenuAndRoutes(userName, to, from)
       next()
     }
+  }
 
-})*/
 
+})
+
+export default router
