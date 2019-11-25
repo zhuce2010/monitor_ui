@@ -78,8 +78,8 @@
 
     </div>
     <div style="margin-top: 20px">
-      <el-button id="toFront"  type="primary"size="medium"  style="margin-left:150px"  @click="getFrontDay" >1-16日</el-button>
-      <el-button id="toBack" type="primary"size="medium"  @click="getBackDay" >17-31日</el-button>
+      <el-button id="toFront"  type="primary"size="medium"  style="margin-left:150px"  @click="getFrontDay" >1-15日</el-button>
+      <el-button id="toBack" type="primary"size="medium"  @click="getBackDay" >16-31日</el-button>
 
     </div>
 
@@ -224,15 +224,15 @@
                 this.weekList =weekList
             },
             /**
-             * 设置前16天的表头
+             * 设置前15天的表头
              */
             setFrontDayColumn: function () {
-                this.showColumnList = new Array(16)
-                for (var i = 1; i <= 16; i++) {
+                this.showColumnList = new Array(15)
+                for (var i = 1; i <= 15; i++) {
                     this.showColumnList[i - 1] = i
                 }
             },
-            //按钮设置前16天表头
+            //按钮设置前15天表头
             getFrontDay(){
 
                 if (this.dayCount ==2)
@@ -241,14 +241,14 @@
                 }
                 this.dayCount =1
             },
-            //按钮设置16天以后的表头
+            //按钮设置15天以后的表头
             getBackDay(){
                 if (this.dayCount ==1)
                 {
                     var day = this.mGetDate(this.nowdate);
-                    this.showColumnList =new Array(day-16)
-                    for ( var i = 17; i < day+1; i++) {
-                        this.showColumnList[i-17] = i
+                    this.showColumnList =new Array(day-15)
+                    for ( var i = 16; i < day+1; i++) {
+                        this.showColumnList[i-16] = i
                 //        console.log(this.showColumnList)
                     }
                     this.dayCount =2
@@ -419,7 +419,7 @@
                 }
                 var toFront = document.getElementById("toFront");
                 var toBack = document.getElementById("toBack");
-                var toBackButtonString = '17-'+ day +'日'
+                var toBackButtonString = '16-'+ day +'日'
                 toBack.innerHTML = toBackButtonString;
                 this.columnList = column
                 this.setFrontDayColumn()
