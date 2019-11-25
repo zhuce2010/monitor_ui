@@ -20,12 +20,12 @@
             this.$router.push('/Schedual/Index')
         },
         toKPI(){
-            window.location.href = "http://133.96.9.70:8080/daily-monitor/KPIMonitor/KPIView"
+            window.open("https://133.96.9.70:8080/daily-monitor/KPIMonitor/KPIView")
 
             //this.$router.push('/daily-monitor/KPIMonitor/KPIView')
         },
         toDaily(){
-            window.location.href = "http://133.96.9.70:8080/daily-monitor/DailyMonitor/DailyView"
+            window.open("https://133.96.9.70:8080/daily-monitor/DailyMonitor/DailyView")
             //this.$router.push('/daily-monitor/DailyMonitor/DailyView')
         },
     },
