@@ -10,11 +10,23 @@
             <el-input type="text" style="width:80%;" v-model="loginForm.account" auto-complete="off" placeholder="账号"></el-input>
           </el-form-item>
           <el-form-item prop="password" >
-            <span style="width:20%;" > 密   码：</span>
-
-            <el-input type="password" style="width:80%;"  v-model="loginForm.password" auto-complete="off" placeholder="密码"></el-input>
-          </el-form-item>
-          <el-form-item>
+            <span style="width:20%;" > 密   码： </span>
+          <el-input type="password" style="width:80%;"  v-model="loginForm.password" auto-complete="off" placeholder="密码"></el-input>
+        </el-form-item>
+          <el-form-item prop="captcha" >
+            <span style="width:20%;" >验证码： </span>
+            <el-input
+              type="text"
+              style="width:60%;"
+              v-model="loginForm.captcha"
+              placeholder="验证码"
+              prefix-icon="icon-login_auth"
+              @keydown.enter.native="login('form')"
+            >
+            </el-input>
+            <span
+              style="width:20%;"
+              class="checkCode" @click="createCode">{{ checkCode}}</span>
           </el-form-item>
           <!-- <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox> -->
           <el-form-item style="width:100%;">
@@ -58,6 +70,7 @@
     import Cookies from "js-cookie"
     import ThemePicker from "@/components/ThemePicker"
     import LangSelector from "@/components/LangSelector"
+    import {Decrypt,Encrypt} from '@/utils/crypto'
 
     export default {
         name: 'Login',
@@ -73,7 +86,6 @@
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
                 },
-
                 loading: false,
                 loginImg: "@/assets/login.jpg",
                 loginForm: {
@@ -81,9 +93,10 @@
                     password: '',
                     phone:'',
                     code:'',
-                    captcha: '',
+                    captcha:'',
                     src: ''
                 },
+                checkCode:'',
                 loginTelForm: {
                     phone:'',
                     code:'',
@@ -92,8 +105,6 @@
                     src: ''
                 },
 
-
-
                 fieldRules: {
                     account: [
                         {required: true, message: '请输入账号', trigger: 'blur'}
@@ -101,15 +112,26 @@
                     password: [
                         {required: true, message: '请输入密码', trigger: 'blur'}
                     ]
-                    // ,
-                    // captcha: [
-                    //   { required: true, message: '请输入验证码', trigger: 'blur' }
-                    // ]
+                    ,
+                    captcha: [
+                      { required: true, message: '请输入验证码', trigger: 'blur' }
+                    ]
                 },
                 checked: true
             }
         },
         methods: {
+            createCode() {
+                var code = "";
+                const codeLength = 4; //验证码的长度
+                const random = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+                    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'); //随机数
+                for(let i = 0; i < codeLength; i++) { //循环操作
+                    let index = Math.floor(Math.random() * 36); //取得随机数的索引（0~35）
+                    code += random[index]; //根据索引取得随机数加到code上
+                }
+                this.checkCode = code; //把code值赋给验证码
+            },
             getCode(){
                 //调用后端获取验证码方法
                 let userInfo = {
@@ -124,11 +146,22 @@
 
             },
             loginPhone(){
+/*
                 //使用手机号登陆
+                if (this.loginForm.captcha==''||this.loginForm.captcha!=this.checkCode)
+                {
+                    alert("未输入验证码或验证码错误，请重新输入")
+                    this.createCode();
+                    return;
+
+                }
+
+*/
+
                 this.loading = true
                 if (this.loginTelForm.code =='')
                 {
-                    alert("请输入验证码")
+                    alert("请输入手机验证码")
                     return
                 }
                 let userInfo = {
@@ -158,24 +191,23 @@
                     })
                 });
 
-
-
-
-
-
             },
-
-
-
-
 
             login() {
              //   this.$router.push('/Home')  // 登录成功，跳转到主页
-
-                          this.loading = true
+                //使用手机号登陆
+                if (this.loginForm.captcha==''||this.loginForm.captcha.toUpperCase()!=this.checkCode)
+                {
+                    alert(this.loginForm.captcha+":"+this.checkCode)
+                    alert("未输入验证码或验证码错误，请重新输入")
+                    this.createCode();
+                    return;
+                }
+                this.loading = true
+                let password =Encrypt(this.loginForm.password)
                           let userInfo = {
                               account: this.loginForm.account,
-                              password: this.loginForm.password,
+                              password: password,
                               captcha: this.loginForm.captcha
                           }
                           this.$api.login.login(userInfo).then((res) => {
@@ -212,6 +244,7 @@
         },
         mounted() {
             this.refreshCaptcha()
+            this.createCode()
         },
         computed: {
             ...mapState({

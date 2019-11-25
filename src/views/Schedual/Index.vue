@@ -1,5 +1,5 @@
 <template>
-  <div class="boxShadow"style="margin-top: 30px;margin-left: 20px">
+  <div class="boxShadow"style="margin-top: 30px;margin-left: 5px">
     <template>
     <div class="block" align="left" >
       <span class="demonstration1">值班月</span>
@@ -9,9 +9,9 @@
         type="month"
         placeholder="选择月">
       </el-date-picker>
-      <el-button class="saveButton" type="primary"size="medium" style="margin-left: 10px" @click="saveTable" >保 存</el-button>
-      <span class="demonstration2" style="margin-left: 20px">前一天提醒时间</span>
-      <el-time-select style="margin-left: 10px"
+      <el-button class="saveButton" type="primary"size="medium" style="margin-left: 5px" @click="saveTable" >保 存</el-button>
+      <span class="demonstration2" style="margin-left: 5px">前一天提醒时间</span>
+      <el-time-select style="margin-left: 5px"
         v-model="setTime1"
         :picker-options="{
           start: '06:00',
@@ -20,9 +20,9 @@
           }"
         placeholder="选择时间">
       </el-time-select>
-      <el-button class="saveButton" type="primary"size="medium" style="margin-left: 10px" @click="saveYesterTime" >保 存</el-button>
+      <el-button class="saveButton" type="primary"size="medium" style="margin-left: 5px" @click="saveYesterTime" >保 存</el-button>
 
-      <span class="demonstration2" style="margin-left: 20px">当天任务提前提醒时间</span>
+      <span class="demonstration2" style="margin-left: 5px">当天任务提前提醒时间</span>
       <el-time-select style="margin-left: 10px"
                       v-model="setTime2"
                       :picker-options="{
@@ -32,8 +32,10 @@
           }"
                       placeholder="选择时间">
       </el-time-select>
-      <el-button class="saveButton" type="primary"size="medium" style="margin-left: 10px" @click="saveThisTime" >保 存</el-button>
-      <el-button class="backToHome" type="primary"size="medium" style="margin-left: 10px" @click="backToHome" >返回首页</el-button>
+      <el-button class="saveButton" type="primary"size="medium" style="margin-left: 5px" @click="saveThisTime" >保 存</el-button>
+      <el-button class="backToHome" type="primary"size="medium" style="margin-left: 5px" @click="backToHome" >返回首页</el-button>
+      <el-button class="backToHome" type="primary"size="medium" style="margin-left: 5px" @click="toDownload" >导出excel</el-button>
+
 
     </div>
     </template>
@@ -58,7 +60,7 @@
         <template v-for='(col) in showColumnList'>
           <el-table-column
             :prop = "String(col)"
-            :label= "String(col)+'日'"
+            :label= "String(col)+'号'+weekList[col-1]"
             align="center"
             width = "85px"
             column-rule-width="0px"
@@ -69,15 +71,15 @@
               </el-button>
             </template>
           </el-table-column>
-
         </template>
-
+        <el-table-column label="值班合计" width="82px" align="center" prop="total"  style="margin-left: 4px" >
+        </el-table-column>
       </el-table>
 
     </div>
     <div style="margin-top: 20px">
-      <el-button id="toFront"  type="primary"size="medium"  style="margin-left:150px"  @click="getFrontDay" >1-15日</el-button>
-      <el-button id="toBack" type="primary"size="medium"  @click="getBackDay" >16-31日</el-button>
+      <el-button id="toFront"  type="primary"size="medium"  style="margin-left:150px"  @click="getFrontDay" >1-16日</el-button>
+      <el-button id="toBack" type="primary"size="medium"  @click="getBackDay" >17-31日</el-button>
 
     </div>
 
@@ -124,122 +126,253 @@
                     enabled: ''
                 },
                 tables: [],
+                weekList:[],
             }
         },
         created() {
             this.loading = false
         },
         methods: {
+            /**
+             *
+             */
+
+            // 导出
+            toDownload() {
+                this.$confirm('此操作将导出excel文件, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.export2Excel()
+                }).catch(() => {
+                });
+            },
+            export2Excel() {
+                require.ensure([], () => {
+                    const {export_json_to_excel} = require('@/utils/Export2Excel');
+                    let monthString =''
+                    let date
+                    if (this.month!=''){
+                        monthString = this.getYearAndMonth(this.month)
+                        date =this.month
+                    }else {
+                        monthString = this.getYearAndMonth(new Date())
+                        date=new Date()
+                    }
+                    var day = this.mGetDate(date);
+                    let tHeader = ['姓名'];
+                    let filterVal = ['realName'];
+                    for(let i=1;i<=day;i++)
+                    {
+                        filterVal.push(i)
+                        tHeader.push(i+"号"+this.weekList[i-1])
+                    }
+                   // tHeader.push(headerlist);
+                    tHeader.push('值班合计');
+
+                    // 上面设置Excel的表格第一行的标题
+                  //  filterVal.push(columnlist);
+                    filterVal.push('total')
+                    // 上面的index、nickName、name是tableData里对象的属性
+                    const list = this.tables;  //把data里的tableData存到list
+                    console.log(list)
+                    const data = this.formatJson(filterVal, list);
+
+                    export_json_to_excel(tHeader, data, monthString+'值班表');
+                })
+            },
+
+            formatJson(filterVal, jsonData) {
+                return jsonData.map(v => filterVal.map(j => v[j]))
+            },
+
+            /**
+             * 获取日期对应的星期
+             * @param now
+             * @returns {string}
+             */
+           getWeekDate(now) {
+        //  var now = new Date();
+            var day = now.getDay();
+            var weeks = new Array("周日", "周一", "周二", "周三", "周四", "周五", "周六");
+            var week = weeks[day];
+            return week;
+    },
+
+            /**
+             * 获取月对应的星期列表
+             */
+            getMonthWeekList(){
+                var day =new Date()
+                if (this.month != '')
+                {
+                    day = this.month
+                }
+                var year = day.getFullYear();
+                var month = day.getMonth()+1;
+                var now = new Date(year,month,0);//日为0使日期变成上个月最后一天，所以这里的month会变成month-1，由于value值是1-12，所以month-1是当前月份。
+                // alert(now)
+               var dayCount = now.getDate();//获取月份的天数
+                var weekList =[]
+                for (var i=0;i<dayCount;i++)
+                {
+                   var listDay = new Date(year,month-1,i+1);//所选月份第一天
+                    weekList.push(this.getWeekDate(listDay))
+                }
+           /*     console.log("星期列表")*/
+                this.weekList =weekList
+            },
+            /**
+             * 设置前16天的表头
+             */
+            setFrontDayColumn: function () {
+                this.showColumnList = new Array(16)
+                for (var i = 1; i <= 16; i++) {
+                    this.showColumnList[i - 1] = i
+                }
+            },
+            //按钮设置前16天表头
             getFrontDay(){
+
                 if (this.dayCount ==2)
                 {
-                    this.showColumnList =new Array(15)
-                    for ( var i = 1; i < 16; i++) {
-                        this.showColumnList[i-1] = i
-                    }
+                    this.setFrontDayColumn();
                 }
                 this.dayCount =1
-
             },
+            //按钮设置16天以后的表头
             getBackDay(){
                 if (this.dayCount ==1)
                 {
                     var day = this.mGetDate(this.nowdate);
-                    this.showColumnList =new Array(day-15)
-                    for ( var i = 16; i < day+1; i++) {
-                        this.showColumnList[i-16] = i
-                        console.log(this.showColumnList)
+                    this.showColumnList =new Array(day-16)
+                    for ( var i = 17; i < day+1; i++) {
+                        this.showColumnList[i-17] = i
+                //        console.log(this.showColumnList)
                     }
                     this.dayCount =2
                 }
             },
 
-
+            /**
+             * 返回主页
+             */
             backToHome(){
                 this.$router.push("/Home")
 
             },
+            /**
+             * 设置列表按钮属性
+             * @param key
+             * @returns {string}
+             */
             buttonType(key){
                 if (key==1) return "danger"
-
             },
+            saveTimeToDataBase: function (params) {
+                this.$api.timeSchedule.save(params).then(res => {
+                    if (res != "ok") {
+                        alert("保存失败，请重新尝试")
+                    }
+                })
+            },
+            /**
+             * 保存前一天提醒的时间到数据库
+             */
             saveYesterTime:function(){
                 var params = {id:1,time:this.setTime1,taskId:1}
-                this.$api.timeSchedule.save(params).then(res=>{
-                    console.log(res)
-                })
-
+                this.saveTimeToDataBase(params);
             },
+            /**
+             * 保存当天提醒时间到数据库
+             */
             saveThisTime:function(){
                 var params = {id:2,time:this.setTime2,taskId:2}
-                this.$api.timeSchedule.save(params).then(res=>{
-                    console.log(res)
-                })
+                this.saveTimeToDataBase(params);
             },
+            /**
+             * 保存值班表到数据库
+             */
             saveTable:function(){
             var tableSave =[]
-                console.log("savetable")
-               console.log(this.tables.toString())
+               /* console.log("savetable")
+               console.log(this.tables)*/
                 this.tables.forEach(table=>{
                     var duty =''
+                    var paramslist =[]
+                    for (var i =0;i<=31;i++){
+                        paramslist.push(i)
+                    }
                     Object.getOwnPropertyNames(table).forEach(function(val, idx, array) {
-                        var paramslist =[]
-                        for (var i =0;i<=31;i++){
-                            paramslist.push(i)
-                        }
                         if (val in paramslist)
                         {
                             duty=duty+table[val]+","
                         }
                     });
                     duty =duty.substr(0,duty.length-1)
-                    console.log("duty")
-                    console.log(duty);
-                    if (this.monthString == null|| this.monthString=='')
+                    if (this.monthString=='')
                     {
-                        if(this.month == null|| this.month==''){
+                        if(this.month==''){
                             this.month =new Date()
                         }
                         //获取当前年月，拼接成字符串
                         this.monthString =this.getYearAndMonth(this.month)
                     }
-                    console.log(table.name)
-                    console.log("年月为："+this.monthString)
-                    const tableTem = {name:table.name,realName:table.realName,duty:duty,month:this.monthString}
-                    console.log("tableTem:"+tableTem.name)
-                    tableSave.push(tableTem)
-                    this.monthString =''
+                   var  tableTem = {name:table.name,realName:table.realName,duty:duty,month:this.monthString,total:table.total}
+                  tableSave.push(tableTem)
                 })
+                this.monthString =''
                 this.$api.duty.save(tableSave).then((res)=>{
-                    console.log(res)
+                    if (res != "ok") {
+                        alert("保存失败，请重新尝试")
+                    }
                 })
-
             },
+            /**
+             * 该函数应该没有使用
+             * @param h
+             * @param column
+             * @param $index
+             */
             changeLabel:function(h, { column, $index }){
                 console.log(column);
-
             },
+            /**
+             * 设置显示月份
+             */
             setMonthChange:function(){
-                console.log("选择月："+this.month)
-               console.log(this.getYearAndMonth(this.month))
+                if (this.month=='')
+                {
+                    this.month =new Date()
+                }
+         /*       console.log("选择月："+this.month)
+               console.log(this.getYearAndMonth(this.month))*/
                 this.loading = true
                 this.dayCount =1
                 this.getDayList(this.month)
                 this.getTables(this.month)
                 this.loading = false
-                console.log("after:"+this.getYearAndMonth(this.month))
+              //  console.log("after:"+this.getYearAndMonth(this.month))
 
             },
+            /**
+             * 设置是否值班
+             **/
             changeStatus:function(scope,col){
-                console.log("改变之前的tables数")
-                console.log(this.tables[scope.$index][col])
+
+         /*       console.log("改变之前的tables数")
+                console.log(scope)
+                console.log(this.tables[scope.$index][col])*/
                 if (scope.row[col] ==0){
                     scope.row[col] = 1
+                    scope.row["total"]+=1
                 }else {
                     scope.row[col] = 0
+                    scope.row["total"]-=1
                 }
-                console.log("改变之后的tables数")
-                console.log( this.tables[scope.$index][col] )
+             /*   console.log("改变之后的tables数")
+                console.log( this.tables[scope.$index][col] )*/
                 /**
                  * 重新加载数据
                  */
@@ -247,29 +380,38 @@
                 console.log("last tables")
                 console.log(this.tables)
             },
+            /**
+             * 获取日期的年月字符串如2019-10
+             * @param date
+             * @returns {string}
+             */
             getYearAndMonth:function(date) {
-                console.log("date:"+date)
                 var newyear = date.getFullYear(); //得到当前日期年份
                 var newmonth = date.getMonth() + 1; //得到当前日期月份（注意： getMonth()方法一月为 0, 二月为 1, 以此类推。）
-                var day = date.getDate(); //得到当前某日日期（1-31）
+               // var day = date.getDate(); //得到当前某日日期（1-31）
                 newmonth = (newmonth < 10 ? "0" + newmonth : newmonth); //10月以下的月份自动加0
-              //  var newdate = newyear + "-" + newmonth;
                 return newyear + "-" + newmonth;
-    },
+            },
+            //获取月天数
              mGetDate:function(date){
                 if (date==null||date =='')
                 {
                      date = new Date();
                 }
                  this.nowdate =date
-                 var year = date.getFullYear();
+              var year = date.getFullYear();
               var month = date.getMonth()+1;
               var d = new Date(year, month, 0);
+              console.log(d)
+              console.log("月天数")
               console.log(d.getDate())
+                 console.log(d.getDay())
               return d.getDate();
             },
+
             getDayList:function(data){
             //    this.columnList =[]
+                this.getMonthWeekList()
                 var column =[]
                var day = this.mGetDate(data);
                 for ( var i = 1; i < day+1; i++) {
@@ -277,25 +419,15 @@
                 }
                 var toFront = document.getElementById("toFront");
                 var toBack = document.getElementById("toBack");
-                var toBackButtonString = '16-'+ day +'日'
+                var toBackButtonString = '17-'+ day +'日'
                 toBack.innerHTML = toBackButtonString;
                 this.columnList = column
-                if (this.dayCount == 1)
-                {
-                    this.showColumnList =new Array(15)
-                    for ( var i = 1; i < 16; i++) {
-                        this.showColumnList[i-1] = i
-                    }
-                }
-                if (this.dayCount == 2)
-                {
-                    this.showColumnList =new Array(day-15)
-                    for ( var i = 16; i < day+1; i++) {
-                        this.showColumnList[i-16] = i
-                    }
-                }
-                console.log(this.columnList)
+                this.setFrontDayColumn()
             },
+            /**
+             * 获取数据表内容
+             * @param data
+             */
             getTables :function(data){
               if(data ==null||data =='')
               {
@@ -306,14 +438,16 @@
               }
             //根据data从数据库获取tables数据
                 var duty ={month:mm}
-                console.log("duty"+duty)
+           //     console.log("duty"+duty)
                 var tablet =[]
                 this.$api.duty.list(duty).then((res) => {
-                    console.log(res)
+              //      console.log(res)
                    res.forEach(ele=>{
                        var tablest ={}
                        Object.getOwnPropertyNames(ele).forEach(function(e, idx, array) {
                 //       ele.forEach(e=>{
+
+                           //对duty属性的列进行拆分
                            if (e == "duty"){
 
                                var dt = ele[e].split(",")
@@ -328,34 +462,37 @@
                     //           tablest.add(e,ele[e])
                            }
                        })
-                       console.log("tablest"+tablest)
+                 //      console.log("tablest"+tablest)
                       tablet.push(tablest)
                    })
-                    console.log(tablet)
+             //       console.log(tablet)
                     this.tables = tablet
                     //格式化数据库数据
-                    //如果数据库中数据不存在，则生成相应数据
+                    //如果数据库中数据不存在，则查询用户表生成相应数据
                     if (res ==null ||res == '')
                     {
                         this.$api.monitoruser.list().then((res) => {
                             console.log(res.length)
                             for (var i = 0;i<res.length;i++){
-                                var name ={"realName" : res[i].realName,"name" : res[i].name}
+                                var name ={"realName" : res[i].realName,"name" : res[i].name,"total":0}
                                 this.tables.push(name)
-                                console.log(this.tables)
+                          //      var total ={"total" : 0}
+                          //      this.tables.push(total)
+
+                                //         console.log(this.tables)
                             }
-                            console.log("table")
+                       /*     console.log("table")
                             console.log(this.tables[0].realName)
                             console.log(this.tables)
                             console.log(this.tables.length)
-                            console.log(this.columnList.length)
+                            console.log(this.columnList.length)*/
                             for (var j=0;j<this.tables.length;j++){
                                 for (var i=1; i<this.columnList.length+1;i++)
                                 {
                                     this.tables[j][i] = 0
                                 }
                             }
-                            console.log("生成的table:"+this.tables)
+                           // console.log("生成的table:"+this.tables)
 
                         })
                     }
@@ -375,7 +512,4 @@
             this.getHeight()
         }
     }
-
-
-
 </script>
