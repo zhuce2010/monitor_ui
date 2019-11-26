@@ -211,7 +211,7 @@
                               captcha: this.loginForm.captcha
                           }
                           this.$api.login.login(userInfo).then((res) => {
-
+                              this.createCode();
                               if (res != 'ok') {
                                   this.$message({
                                       message: res,
