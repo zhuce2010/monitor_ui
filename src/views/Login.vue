@@ -122,15 +122,19 @@
         },
         methods: {
             createCode() {
-                var code = "";
+              /*  var code = "";
                 const codeLength = 4; //验证码的长度
                 const random = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
                     'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'); //随机数
                 for(let i = 0; i < codeLength; i++) { //循环操作
                     let index = Math.floor(Math.random() * 36); //取得随机数的索引（0~35）
                     code += random[index]; //根据索引取得随机数加到code上
-                }
-                this.checkCode = code; //把code值赋给验证码
+                }*/
+              this.$api.login.getCaptcha().then((res)=>{
+                      this.checkCode = res; //把code值赋给验证码
+                  }
+              )
+
             },
             getCode(){
                 //调用后端获取验证码方法
@@ -145,19 +149,9 @@
                 });
 
             },
+
+
             loginPhone(){
-/*
-                //使用手机号登陆
-                if (this.loginForm.captcha==''||this.loginForm.captcha!=this.checkCode)
-                {
-                    alert("未输入验证码或验证码错误，请重新输入")
-                    this.createCode();
-                    return;
-
-                }
-
-*/
-
                 this.loading = true
                 if (this.loginTelForm.code =='')
                 {
@@ -167,6 +161,7 @@
                 let userInfo = {
                     phone: this.loginTelForm.phone,
                     code: this.loginTelForm.code,
+
 
                 }
                 //调用使用手机号登陆方法
@@ -198,7 +193,7 @@
                 //使用手机号登陆
                 if (this.loginForm.captcha==''||this.loginForm.captcha.toUpperCase()!=this.checkCode)
                 {
-                    alert(this.loginForm.captcha+":"+this.checkCode)
+              //      alert(this.loginForm.captcha+":"+this.checkCode)
                     alert("未输入验证码或验证码错误，请重新输入")
                     this.createCode();
                     return;

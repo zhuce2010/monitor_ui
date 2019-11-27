@@ -274,6 +274,8 @@
                 this.$api.timeSchedule.save(params).then(res => {
                     if (res != "ok") {
                         alert("保存失败，请重新尝试")
+                    }else {
+                        alert("保存成功")
                     }
                 })
             },

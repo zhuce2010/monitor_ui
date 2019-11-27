@@ -44,3 +44,11 @@ export const getCode = (data) => {
     data
   })
 }
+// 使用手机号登陆
+export const getCaptcha = (data) => {
+  return axios({
+    url: 'captcha',
+    method: 'post',
+    data
+  })
+}
