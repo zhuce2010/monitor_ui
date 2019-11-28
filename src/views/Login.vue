@@ -35,11 +35,11 @@
           </el-form-item>
         </el-tab-pane>
         <el-tab-pane label="手机号登陆">
-          <el-form-item prop="phonenumber"  >
+          <el-form-item prop="phone"  >
             <span style="width:20%;" > 手机号：  </span>
             <el-input type="text" style="width:80%;" v-model="loginTelForm.phone" auto-complete="off" placeholder="手机号"></el-input>
           </el-form-item>
-          <el-form-item prop="phonecode" >
+          <el-form-item prop="code" >
             <span style="width:20%;" > 验证码：</span>
             <el-input type="text" style="width:80%;"  v-model="loginTelForm.code" auto-complete="off" placeholder="验证码"></el-input>
           </el-form-item>
@@ -116,10 +116,10 @@
                     captcha: [
                       { required: true, message: '请输入验证码', trigger: 'blur' }
                     ],
-                    phonenumber: [
+                    phone: [
                         { required: true, message: '请输入手机号', trigger: 'blur' }
                     ],
-                    phonecode: [
+                    code: [
                         { required: true, message: '请输入手机验证码', trigger: 'blur' }
                     ],
                 },
@@ -128,14 +128,6 @@
         },
         methods: {
             createCode() {
-              /*  var code = "";
-                const codeLength = 4; //验证码的长度
-                const random = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'); //随机数
-                for(let i = 0; i < codeLength; i++) { //循环操作
-                    let index = Math.floor(Math.random() * 36); //取得随机数的索引（0~35）
-                    code += random[index]; //根据索引取得随机数加到code上
-                }*/
               this.$api.login.getCaptcha().then((res)=>{
                       this.checkCode = res; //把code值赋给验证码
                   }
@@ -167,20 +159,21 @@
                 let userInfo = {
                     phone: this.loginTelForm.phone,
                     code: this.loginTelForm.code,
-
-
                 }
                 //调用使用手机号登陆方法
                 this.$api.login.loginPhone(userInfo).then((res) => {
-
-                    if (res != 'ok') {
+                    var returndata= res.toString().split(":")
+                    let encodePhone =Encrypt(this.loginTelForm.phone)
+                    if (returndata[0] != encodePhone) {
                         this.$message({
                             message: res,
                             type: 'error'
                         })
                     } else {
                         //              Cookies.set('token', res.data.token) // 放置token到Cookie
-                        sessionStorage.setItem('user', userInfo.account) // 保存用户到本地会话
+                        sessionStorage.setItem('user', userInfo.phone) // 保存用户到本地会话
+                        sessionStorage.setItem('session', returndata[1]) // 保存用户到本地会话
+
                         //              this.$store.commit('menuRouteLoaded', false) // 要求重新加载导航菜单
                         this.$router.push('/Home')  // 登录成功，跳转到主页
                     }
@@ -213,7 +206,11 @@
                           }
                           this.$api.login.login(userInfo).then((res) => {
                               this.createCode();
-                              if (res != 'ok') {
+                              var returndata= res.toString().split(":")
+                              console.log(returndata)
+                              let encodeAccount =Encrypt(this.loginForm.account)
+                              console.log(encodeAccount)
+                              if (returndata[0] != encodeAccount) {
                                   this.$message({
                                       message: res,
                                       type: 'error'
@@ -221,7 +218,8 @@
                               } else {
                     //              Cookies.set('token', res.data.token) // 放置token到Cookie
                                   sessionStorage.setItem('user', userInfo.account) // 保存用户到本地会话
-                    //              this.$store.commit('menuRouteLoaded', false) // 要求重新加载导航菜单
+                                  sessionStorage.setItem('session', returndata[1]) // 保存用户到本地会话
+                                  //              this.$store.commit('menuRouteLoaded', false) // 要求重新加载导航菜单
                                   this.$router.push('/Home')  // 登录成功，跳转到主页
                               }
                               this.loading = false

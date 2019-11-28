@@ -52,3 +52,11 @@ export const getCaptcha = (data) => {
     data
   })
 }
+// 验证session
+export const checkSession = (data) => {
+  return axios({
+    url: 'checkSession',
+    method: 'post',
+    data
+  })
+}

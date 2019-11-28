@@ -13,19 +13,49 @@
 </template>
 
 <script>
+    import {Decrypt,Encrypt} from '@/utils/crypto'
+
     export default {
     methods: {
         toSchedual()
         {
-            this.$router.push('/Schedual/Index')
+            let session =sessionStorage.getItem("session")
+            this.$api.login.checkSession(session).then((res)=>{
+               let enSession = Encrypt(session)
+                if (enSession == res)
+                {
+                    this.$router.push('/Schedual/Index')
+                }else {
+                    alert("session不正确")
+                }
+
+
+            })
+
         },
         toKPI(){
-            window.open("https://133.96.9.70:8080/daily-monitor/KPIMonitor/KPIView")
-
+            let session =sessionStorage.getItem("session")
+            this.$api.login.checkSession(session).then((res)=>{
+                let enSession = Encrypt(session)
+                if (enSession == res)
+                {
+                    window.open("https://133.96.9.70:8080/daily-monitor/KPIMonitor/KPIView")
+                }else {
+                    alert("session不正确")
+                }
+            })
             //this.$router.push('/daily-monitor/KPIMonitor/KPIView')
         },
         toDaily(){
-            window.open("https://133.96.9.70:8080/daily-monitor/DailyMonitor/DailyView")
+            this.$api.login.checkSession(session).then((res)=>{
+                let enSession = Encrypt(session)
+                if (enSession == res)
+                {
+                    window.open("https://133.96.9.70:8080/daily-monitor/DailyMonitor/DailyView")
+                }else {
+                    alert("session不正确")
+                }
+            })
             //this.$router.push('/daily-monitor/DailyMonitor/DailyView')
         },
     },
