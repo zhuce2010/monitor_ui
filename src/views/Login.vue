@@ -35,11 +35,11 @@
           </el-form-item>
         </el-tab-pane>
         <el-tab-pane label="手机号登陆">
-          <el-form-item prop="account"  >
+          <el-form-item prop="phonenumber"  >
             <span style="width:20%;" > 手机号：  </span>
             <el-input type="text" style="width:80%;" v-model="loginTelForm.phone" auto-complete="off" placeholder="手机号"></el-input>
           </el-form-item>
-          <el-form-item prop="password" >
+          <el-form-item prop="phonecode" >
             <span style="width:20%;" > 验证码：</span>
             <el-input type="text" style="width:80%;"  v-model="loginTelForm.code" auto-complete="off" placeholder="验证码"></el-input>
           </el-form-item>
@@ -115,7 +115,13 @@
                     ,
                     captcha: [
                       { required: true, message: '请输入验证码', trigger: 'blur' }
-                    ]
+                    ],
+                    phonenumber: [
+                        { required: true, message: '请输入手机号', trigger: 'blur' }
+                    ],
+                    phonecode: [
+                        { required: true, message: '请输入手机验证码', trigger: 'blur' }
+                    ],
                 },
                 checked: true
             }
