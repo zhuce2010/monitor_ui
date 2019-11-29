@@ -116,12 +116,12 @@
                     captcha: [
                       { required: true, message: '请输入验证码', trigger: 'blur' }
                     ],
-                    phone: [
+                   /* phone: [
                         { required: true, message: '请输入手机号', trigger: 'blur' }
                     ],
                     code: [
                         { required: true, message: '请输入手机验证码', trigger: 'blur' }
-                    ],
+                    ],*/
                 },
                 checked: true
             }
@@ -140,6 +140,9 @@
                     phone: this.loginTelForm.phone,
                 }
                 this.$api.login.getCode(userInfo).then((res) => {
+                    if(res!='ok'){
+                      alert(res)
+                    }
                 /*    console.log("时间戳："+res)
                     this.loginTelForm.codeCreateTime =res
                     */
