@@ -47,6 +47,7 @@
             //this.$router.push('/daily-monitor/KPIMonitor/KPIView')
         },
         toDaily(){
+            let session =sessionStorage.getItem("session")
             this.$api.login.checkSession(session).then((res)=>{
                 let enSession = Encrypt(session)
                 if (enSession == res)
