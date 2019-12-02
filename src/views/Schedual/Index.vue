@@ -66,7 +66,7 @@
             column-rule-width="0px"
           >
             <template slot-scope="scope">
-              <el-button size="small" v-for="item in monitorTypeOptions" :key="item.key"  v-if="scope.row[col]=== item.key" @click="changeStatus(scope,col)"   :type="buttonType(item.key)" >
+              <el-button size="small" :disabled="buttonable()" v-for="item in monitorTypeOptions" :key="item.key"  v-if="scope.row[col]=== item.key" @click="changeStatus(scope,col)"   :type="buttonType(item.key)" >
                 {{item.display_name}}
               </el-button>
             </template>
@@ -136,6 +136,16 @@
             /**
              *
              */
+            buttonable(){
+                let user=sessionStorage.getItem("user")
+                console.log("user")
+                console.log(user)
+                if (user != "lujh1"||user !="15531610100"){
+                    return true
+                }else {
+                    return false
+                }
+            },
 
             // 导出
             toDownload() {
