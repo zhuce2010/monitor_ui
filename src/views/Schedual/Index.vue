@@ -138,12 +138,12 @@
              */
             buttonable(){
                 let user=sessionStorage.getItem("user")
-                console.log("user")
-                console.log(user)
-                if (user != "lujh1"||user !="15531610100"){
-                    return true
-                }else {
+              /*  // console.log("user")
+                // console.log(user)*/
+                if (user == "lujh1"||user =="15531610100"){
                     return false
+                }else {
+                    return true
                 }
             },
 
@@ -186,7 +186,7 @@
                     filterVal.push('total')
                     // 上面的index、nickName、name是tableData里对象的属性
                     const list = this.tables;  //把data里的tableData存到list
-                    console.log(list)
+           //         console.log(list)
                     const data = this.formatJson(filterVal, list);
 
                     export_json_to_excel(tHeader, data, monthString+'值班表');
@@ -348,7 +348,7 @@
              * @param $index
              */
             changeLabel:function(h, { column, $index }){
-                console.log(column);
+        //        console.log(column);
             },
             /**
              * 设置显示月份
@@ -389,8 +389,8 @@
                  * 重新加载数据
                  */
                 this.$set(this.tables,scope.$index,this.tables[scope.$index]);
-                console.log("last tables")
-                console.log(this.tables)
+             /*   console.log("last tables")
+                console.log(this.tables)*/
             },
             /**
              * 获取日期的年月字符串如2019-10
@@ -414,10 +414,10 @@
               var year = date.getFullYear();
               var month = date.getMonth()+1;
               var d = new Date(year, month, 0);
-              console.log(d)
+         /*     console.log(d)
               console.log("月天数")
               console.log(d.getDate())
-                 console.log(d.getDay())
+                 console.log(d.getDay())*/
               return d.getDate();
             },
 
@@ -468,7 +468,7 @@
                                    tablest[(parseInt(dtd)+1)] =parseInt(dt[dtd])
                             //       tablest.add(dtd,dt[dtd])
                                })
-                               console.log(dt)
+                 //              console.log(dt)
                            }else {
                                tablest[e] =ele[e]
                     //           tablest.add(e,ele[e])
@@ -484,7 +484,7 @@
                     if (res ==null ||res == '')
                     {
                         this.$api.monitoruser.list().then((res) => {
-                            console.log(res.length)
+                      //      console.log(res.length)
                             for (var i = 0;i<res.length;i++){
                                 var name ={"realName" : res[i].realName,"name" : res[i].name,"total":0}
                                 this.tables.push(name)

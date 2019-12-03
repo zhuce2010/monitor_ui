@@ -210,9 +210,9 @@
                           this.$api.login.login(userInfo).then((res) => {
                               this.createCode();
                               var returndata= res.toString().split(":")
-                              console.log(returndata)
+                       //       console.log(returndata)
                               let encodeAccount =Encrypt(this.loginForm.account)
-                              console.log(encodeAccount)
+                    //          console.log(encodeAccount)
                               if (returndata[0] != encodeAccount) {
                                   this.$message({
                                       message: res,
